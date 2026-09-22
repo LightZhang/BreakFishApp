@@ -1,22 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
+using BreakFishApp.Forms;
 
 namespace BreakFishApp
 {
     static class Program
     {
-        /// <summary>
-        /// 应用程序的主入口点。
-        /// </summary>
+        private const string MutexName = "FishBreak.SingleInstance";
+        private const string ShowEventName = "FishBreak.ShowWindow";
+
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            if (args != null && args.Length > 0 && string.Equals(args[0], "--self-test", StringComparison.OrdinalIgnoreCase))
+            {
+                Environment.Exit(SelfTests.Run());
+                return;
+            }
+
+            bool created;
+            using (var mutex = new Mutex(true, MutexName, out created))
+            {
+                if (!created)
+                {
+                    using (var ev = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName))
+                    {
+                        ev.Set();
+                    }
+
+                    return;
+                }
+
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                using (var showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName))
+                {
+                    Application.Run(new MainForm(showEvent));
+                }
+            }
         }
     }
 }

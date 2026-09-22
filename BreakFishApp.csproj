@@ -44,15 +44,46 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="Program.cs" />
+    <Compile Include="SelfTests.cs" />
+    <Compile Include="UiTheme.cs" />
+    <Compile Include="Models\WorkStatus.cs" />
+    <Compile Include="Models\AppSettings.cs" />
+    <Compile Include="Models\ReminderItem.cs" />
+    <Compile Include="Models\ScheduleEvent.cs" />
+    <Compile Include="Models\DailyState.cs" />
+    <Compile Include="Models\ScheduleState.cs" />
+    <Compile Include="Utils\TimeHelper.cs" />
+    <Compile Include="Utils\JsonFile.cs" />
+    <Compile Include="Services\IClock.cs" />
+    <Compile Include="Services\ScheduleBuilder.cs" />
+    <Compile Include="Services\ReminderSelector.cs" />
+    <Compile Include="Services\WorkScheduler.cs" />
+    <Compile Include="Services\SettingsService.cs" />
+    <Compile Include="Services\StartupService.cs" />
+    <Compile Include="Services\NotificationService.cs" />
+    <Compile Include="Managers\TrayManager.cs" />
+    <Compile Include="Controls\HomePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\PlanPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\StatsPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SettingsPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Forms\ReminderDialog.cs">
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
