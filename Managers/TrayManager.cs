@@ -47,6 +47,7 @@ namespace BreakFishApp.Managers
             _menu.Items.Add(new ToolStripSeparator());
             _menu.Items.Add("打开主窗口", null, delegate { showMain(); });
             _menu.Items.Add("设置", null, delegate { showSettings(); });
+            _menu.Items.Add("联系作者", null, delegate { ShowAuthor(); });
             _menu.Items.Add(new ToolStripSeparator());
             _menu.Items.Add("退出", null, delegate { exit(); });
             _menu.Opening += OnOpening;
@@ -97,6 +98,20 @@ namespace BreakFishApp.Managers
             else
             {
                 _nextItem.Text = "下一次：暂无";
+            }
+        }
+
+        private static void ShowAuthor()
+        {
+            const string wechat = "z5678701";
+            try
+            {
+                Clipboard.SetText(wechat);
+                MessageBox.Show("微信号：" + wechat + "\n已复制到剪贴板，打开微信即可添加。", "联系作者", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch
+            {
+                MessageBox.Show("微信号：" + wechat, "联系作者", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
