@@ -152,7 +152,7 @@ namespace BreakFishApp.Forms
                 }
 
                 _reminderOpen = true;
-                using (var dialog = new ReminderDialog(item))
+                using (var dialog = new ReminderDialog(item, () => _scheduler.PickSame(item)))
                 {
                     var result = dialog.ShowDialog(this);
                     if (result == DialogResult.OK)

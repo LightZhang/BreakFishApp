@@ -129,6 +129,17 @@ namespace BreakFishApp.Services
             return _nextReminder;
         }
 
+        /// <summary>同类型随机换一条提醒文案，供"换一个"使用。</summary>
+        public ReminderItem PickSame(ReminderItem current)
+        {
+            if (current == null)
+            {
+                return null;
+            }
+
+            return _selector.PickSame(current.Type, WorkMinutes(), _settings.BreakMinutes);
+        }
+
         public void StartBreak()
         {
             var now = _clock.Now;

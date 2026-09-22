@@ -37,6 +37,12 @@ namespace BreakFishApp.Services
 
             return _catalog.Pick(type, workMinutes, breakMinutes, _random);
         }
+
+        /// <summary>同类型随机换一条，不推进轮换。</summary>
+        public ReminderItem PickSame(string type, int workMinutes, int breakMinutes)
+        {
+            return _catalog.Pick(type, workMinutes, breakMinutes, _random);
+        }
     }
 
     public class ReminderCatalog
