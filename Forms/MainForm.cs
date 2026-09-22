@@ -16,8 +16,6 @@ namespace BreakFishApp.Forms
         private readonly DailyStateService _dailyService = new DailyStateService();
         private readonly WorkScheduler _scheduler;
         private readonly HomePage _home = new HomePage();
-        private readonly PlanPage _plan = new PlanPage();
-        private readonly StatsPage _stats = new StatsPage();
         private readonly SettingsPage _settingsPage = new SettingsPage();
         private readonly Panel _content = new Panel();
         private readonly System.Windows.Forms.Timer _timer = new System.Windows.Forms.Timer();
@@ -27,10 +25,6 @@ namespace BreakFishApp.Forms
         private AppSettings _settings;
         private bool _allowExit;
         private bool _reminderOpen;
-        private Button _navHome;
-        private Button _navPlan;
-        private Button _navStats;
-        private Button _navSettings;
 
         public MainForm(EventWaitHandle showEvent)
         {
@@ -53,8 +47,10 @@ namespace BreakFishApp.Forms
             BuildUi();
 
             _home.RestNow += () => _scheduler.RestNow();
+            _home.OpenSettings += () => ShowPage(_settingsPage);
             _settingsPage.Saved += OnSettingsSaved;
             _settingsPage.ResetRequested += OnReset;
+            _settingsPage.BackRequested += () => ShowPage(_home);
             _settingsPage.Bind(_settings, daily.TodayEndTime);
 
             _timer.Interval = 1000;
@@ -76,7 +72,7 @@ namespace BreakFishApp.Forms
                 ExitApp);
             _notifications = new NotificationService(_tray.NotifyIcon, () => _settings);
 
-            ShowPage(_home, _navHome);
+            ShowPage(_home);
             RefreshUi();
 
             if (_showEvent != null)
@@ -88,41 +84,12 @@ namespace BreakFishApp.Forms
 
         private void BuildUi()
         {
-            var nav = new Panel
-            {
-                Dock = DockStyle.Left,
-                Width = 88,
-                BackColor = UiTheme.Nav,
-                Padding = new Padding(8)
-            };
-
-            _navHome = NavButton("首页", 12);
-            _navPlan = NavButton("计划", 52);
-            _navStats = NavButton("统计", 92);
-            _navSettings = NavButton("设置", 132);
-            _navHome.Click += delegate { ShowPage(_home, _navHome); };
-            _navPlan.Click += delegate
-            {
-                _plan.Bind(_scheduler.GetCurrentState());
-                ShowPage(_plan, _navPlan);
-            };
-            _navStats.Click += delegate { ShowPage(_stats, _navStats); };
-            _navSettings.Click += delegate { ShowPage(_settingsPage, _navSettings); };
-
-            nav.Controls.Add(_navHome);
-            nav.Controls.Add(_navPlan);
-            nav.Controls.Add(_navStats);
-            nav.Controls.Add(_navSettings);
-
             _content.Dock = DockStyle.Fill;
             _content.BackColor = UiTheme.Paper;
             _home.Dock = DockStyle.Fill;
-            _plan.Dock = DockStyle.Fill;
-            _stats.Dock = DockStyle.Fill;
             _settingsPage.Dock = DockStyle.Fill;
 
             Controls.Add(_content);
-            Controls.Add(nav);
         }
 
         private Button NavButton(string text, int y)
@@ -143,20 +110,10 @@ namespace BreakFishApp.Forms
             return button;
         }
 
-        private void ShowPage(Control page, Button nav)
+        private void ShowPage(Control page)
         {
             _content.Controls.Clear();
             _content.Controls.Add(page);
-            Highlight(nav);
-        }
-
-        private void Highlight(Button active)
-        {
-            foreach (var button in new[] { _navHome, _navPlan, _navStats, _navSettings })
-            {
-                button.BackColor = button == active ? UiTheme.AccentSoft : Color.Transparent;
-                button.ForeColor = button == active ? UiTheme.Accent : UiTheme.Ink;
-            }
         }
 
         private void OnTick(object sender, EventArgs e)
@@ -169,7 +126,6 @@ namespace BreakFishApp.Forms
         {
             var state = _scheduler.GetCurrentState();
             _home.Bind(state);
-            _stats.Bind(state);
             if (_tray != null)
             {
                 _tray.Refresh();
@@ -266,7 +222,7 @@ namespace BreakFishApp.Forms
         public void ShowSettings()
         {
             ShowMain();
-            ShowPage(_settingsPage, _navSettings);
+            ShowPage(_settingsPage);
         }
 
         private void ExitApp()

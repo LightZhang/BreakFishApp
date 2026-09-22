@@ -20,6 +20,9 @@ namespace BreakFishApp
                 Snooze_MovesFiveMinutes();
                 TodayEnd_RebuildsPlan();
                 Pause_BlocksWorking();
+                Holiday_OnWorkday_IsIdle();
+                Makeup_OnWeekend_IsWorking();
+                HolidayDisabled_FallsBackToWorkDays();
                 Console.WriteLine("self-test ok");
                 return 0;
             }
@@ -131,6 +134,40 @@ namespace BreakFishApp
         private static WorkScheduler Create(FakeClock clock)
         {
             return new WorkScheduler(AppSettings.CreateDefault(), new DailyState { Date = clock.Now.ToString("yyyy-MM-dd") }, clock, delegate { });
+        }
+
+        private static WorkScheduler Create(FakeClock clock, AppSettings settings)
+        {
+            return new WorkScheduler(settings, new DailyState { Date = clock.Now.ToString("yyyy-MM-dd") }, clock, delegate { });
+        }
+
+        private static void Holiday_OnWorkday_IsIdle()
+        {
+            // 2026-10-01 国庆，周四（本是工作日），启用识别应为休息
+            var clock = new FakeClock(new DateTime(2026, 10, 1, 10, 0, 0));
+            var scheduler = Create(clock);
+            scheduler.Tick();
+            Assert(scheduler.GetCurrentState().Status == WorkStatus.Idle, "holiday should be idle");
+        }
+
+        private static void Makeup_OnWeekend_IsWorking()
+        {
+            // 2026-10-10 周六补班，启用识别应为工作
+            var clock = new FakeClock(new DateTime(2026, 10, 10, 10, 0, 0));
+            var scheduler = Create(clock);
+            scheduler.Tick();
+            Assert(scheduler.GetCurrentState().Status == WorkStatus.Working, "makeup workday should be working");
+        }
+
+        private static void HolidayDisabled_FallsBackToWorkDays()
+        {
+            // 2026-10-01 国庆周四，关闭识别后按工作日勾选应为工作
+            var clock = new FakeClock(new DateTime(2026, 10, 1, 10, 0, 0));
+            var settings = AppSettings.CreateDefault();
+            settings.HolidayAware = false;
+            var scheduler = Create(clock, settings);
+            scheduler.Tick();
+            Assert(scheduler.GetCurrentState().Status == WorkStatus.Working, "holiday disabled should fall back to workdays");
         }
 
         private static string FindKind(List<ScheduleEvent> plan, string kind, int index)

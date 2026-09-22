@@ -19,9 +19,15 @@ namespace BreakFishApp.Controls
         private readonly Label _nextTitle;
         private readonly Label _nextMessage;
         private readonly Button _rest;
-        private readonly Label _today;
+        private readonly Button _settings;
+        private readonly Label _statsTitle;
+        private readonly Label _work;
+        private readonly Label _rest2;
+        private readonly Label _reminders;
+        private readonly Label _skips;
 
         public event Action RestNow;
+        public event Action OpenSettings;
 
         public HomePage()
         {
@@ -30,15 +36,28 @@ namespace BreakFishApp.Controls
             Dock = DockStyle.Fill;
             Padding = new Padding(28, 22, 28, 18);
 
+            var brandRow = new Panel { Dock = DockStyle.Top, Height = 32 };
             _brand = new Label
             {
                 Text = "🐟  FishBreak",
                 Font = UiTheme.BrandFont,
                 ForeColor = UiTheme.Ink,
                 AutoSize = true,
-                Dock = DockStyle.Top,
-                Height = 30
+                Dock = DockStyle.Left
             };
+            _settings = UiTheme.GhostButton("⚙  设置");
+            _settings.Dock = DockStyle.Right;
+            _settings.Width = 84;
+            _settings.Height = 30;
+            _settings.Click += delegate
+            {
+                if (OpenSettings != null)
+                {
+                    OpenSettings();
+                }
+            };
+            brandRow.Controls.Add(_brand);
+            brandRow.Controls.Add(_settings);
 
             _sub = new Label
             {
@@ -57,7 +76,7 @@ namespace BreakFishApp.Controls
                 Size = new Size(96, 28),
                 Dock = DockStyle.Top,
                 Height = 36,
-                Margin = new Padding(0, 16, 0, 0)
+                Margin = new Padding(0, 14, 0, 0)
             };
             _badgeText = new Label
             {
@@ -97,9 +116,10 @@ namespace BreakFishApp.Controls
                 Radius = UiTheme.Radius,
                 BackColor = UiTheme.Panel,
                 BorderColor = UiTheme.Line,
-                Dock = DockStyle.Fill,
+                Dock = DockStyle.Top,
+                Height = 130,
                 Padding = new Padding(18, 16, 18, 16),
-                Margin = new Padding(0, 18, 0, 0)
+                Margin = new Padding(0, 16, 0, 0)
             };
 
             _nextLabel = new Label
@@ -128,10 +148,14 @@ namespace BreakFishApp.Controls
                 Height = 48,
                 Margin = new Padding(0, 2, 0, 0)
             };
+            _card.Controls.Add(_nextMessage);
+            _card.Controls.Add(_nextTitle);
+            _card.Controls.Add(_nextLabel);
 
             _rest = UiTheme.PrimaryButton("立即休息一下");
-            _rest.Dock = DockStyle.Bottom;
-            _rest.Height = 44;
+            _rest.Dock = DockStyle.Top;
+            _rest.Height = 42;
+            _rest.Margin = new Padding(0, 16, 0, 0);
             _rest.Click += delegate
             {
                 if (RestNow != null)
@@ -140,28 +164,41 @@ namespace BreakFishApp.Controls
                 }
             };
 
-            _today = new Label
+            _statsTitle = new Label
             {
-                Text = "今日：工作 0m · 休息 0m",
-                Font = UiTheme.SmallFont,
-                ForeColor = UiTheme.Mute,
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Bottom,
-                Height = 28
+                Text = "今日统计",
+                Font = UiTheme.CaptionFont,
+                ForeColor = UiTheme.Ink,
+                Dock = DockStyle.Top,
+                Height = 28,
+                Margin = new Padding(0, 18, 0, 6)
             };
 
-            _card.Controls.Add(_nextMessage);
-            _card.Controls.Add(_nextTitle);
-            _card.Controls.Add(_nextLabel);
+            var statsGrid = new TableLayoutPanel
+            {
+                Dock = DockStyle.Top,
+                Height = 86,
+                ColumnCount = 4,
+                RowCount = 1
+            };
+            for (var i = 0; i < 4; i++)
+            {
+                statsGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
+            }
+            _work = AddStat(statsGrid, 0, "工作", "0m", UiTheme.Accent);
+            _rest2 = AddStat(statsGrid, 1, "休息", "0m", UiTheme.Break);
+            _reminders = AddStat(statsGrid, 2, "提醒", "0", UiTheme.Lunch);
+            _skips = AddStat(statsGrid, 3, "跳过", "0", UiTheme.Mute);
 
-            Controls.Add(_today);
+            Controls.Add(statsGrid);
+            Controls.Add(_statsTitle);
+            Controls.Add(_rest);
             Controls.Add(_card);
             Controls.Add(_hint);
             Controls.Add(_countdown);
             Controls.Add(_badge);
             Controls.Add(_sub);
-            Controls.Add(_brand);
+            Controls.Add(brandRow);
         }
 
         public void Bind(ScheduleState state)
@@ -195,9 +232,48 @@ namespace BreakFishApp.Controls
                 _nextMessage.Text = "当前不在工作提醒时段，放松一下。";
             }
 
-            _today.Text = "今日：工作 " + TimeHelper.FormatDuration(state.WorkedSeconds) +
-                          " · 休息 " + TimeHelper.FormatDuration(state.BreakSeconds);
+            _work.Text = TimeHelper.FormatDuration(state.WorkedSeconds);
+            _rest2.Text = TimeHelper.FormatDuration(state.BreakSeconds);
+            _reminders.Text = state.ReminderCount.ToString();
+            _skips.Text = state.SkipCount.ToString();
             _rest.Enabled = state.Status == WorkStatus.Working;
+        }
+
+        private static Label AddStat(TableLayoutPanel grid, int col, string caption, string value, Color accent)
+        {
+            var panel = new RoundPanel
+            {
+                Radius = 10,
+                BackColor = UiTheme.Panel,
+                BorderColor = UiTheme.Line,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(4),
+                Padding = new Padding(8, 8, 8, 8)
+            };
+
+            var cap = new Label
+            {
+                Text = caption,
+                Font = UiTheme.SmallFont,
+                ForeColor = UiTheme.Mute,
+                Dock = DockStyle.Top,
+                Height = 20,
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            var val = new Label
+            {
+                Text = value,
+                Font = new Font("Microsoft YaHei UI", 14F, FontStyle.Bold),
+                ForeColor = accent,
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            panel.Controls.Add(val);
+            panel.Controls.Add(cap);
+            grid.Controls.Add(panel, col, 0);
+            return val;
         }
 
         private static string HintFor(WorkStatus status)
@@ -238,7 +314,6 @@ namespace BreakFishApp.Controls
 
         private static Color Tint(Color c)
         {
-            // 把状态色调成柔和底色：混入大量白
             return Color.FromArgb((c.R + 255 * 3) / 4, (c.G + 255 * 3) / 4, (c.B + 255 * 3) / 4);
         }
     }

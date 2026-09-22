@@ -488,6 +488,20 @@ namespace BreakFishApp.Services
 
         private bool IsWorkDay(DateTime now)
         {
+            // 启用节假日识别时：调休补班日即使周末也算工作日；法定节假日即使工作日也不算工作日。
+            if (_settings.HolidayAware)
+            {
+                if (HolidayCalendar.IsMakeupWorkday(now))
+                {
+                    return true;
+                }
+
+                if (HolidayCalendar.IsHoliday(now))
+                {
+                    return false;
+                }
+            }
+
             if (_settings.WorkDays == null || _settings.WorkDays.Count == 0)
             {
                 return false;

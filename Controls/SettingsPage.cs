@@ -21,12 +21,14 @@ namespace BreakFishApp.Controls
         private readonly CheckBox _autoStart;
         private readonly CheckBox _notify;
         private readonly CheckBox _sound;
+        private readonly CheckBox _holiday;
         private readonly DateTimePicker _todayEnd;
         private readonly CheckBox _todayOnly;
         private readonly Label _error;
 
         public event Action<AppSettings, string, bool> Saved;
         public event Action ResetRequested;
+        public event Action BackRequested;
 
         public SettingsPage()
         {
@@ -45,6 +47,19 @@ namespace BreakFishApp.Controls
                 AutoSize = true
             };
             Controls.Add(title);
+
+            var back = UiTheme.GhostButton("← 返回首页");
+            back.Location = new Point(300, 14);
+            back.Width = 100;
+            back.Height = 30;
+            back.Click += delegate
+            {
+                if (BackRequested != null)
+                {
+                    BackRequested();
+                }
+            };
+            Controls.Add(back);
 
             var subtitle = new Label
             {
@@ -126,7 +141,27 @@ namespace BreakFishApp.Controls
             _sound = new CheckBox { Text = "提醒时播放提示音", Location = new Point(20, y), AutoSize = true };
             Controls.Add(_sound);
 
-            y += 36;
+            y += 28;
+            _holiday = new CheckBox
+            {
+                Text = "自动识别节假日和调休",
+                Location = new Point(20, y),
+                AutoSize = true,
+                Checked = true
+            };
+            Controls.Add(_holiday);
+
+            var holidayHint = new Label
+            {
+                Text = "内置法定节假日与调休补班表，未覆盖的日期按工作日勾选判断",
+                Font = UiTheme.SmallFont,
+                ForeColor = UiTheme.Hint,
+                Location = new Point(36, y + 22),
+                AutoSize = true
+            };
+            Controls.Add(holidayHint);
+
+            y += 44;
             Controls.Add(LabelAt("今天下班", y));
             _todayEnd = TimePicker(120, y - 2);
             Controls.Add(_todayEnd);
@@ -186,6 +221,7 @@ namespace BreakFishApp.Controls
             _autoStart.Checked = settings.AutoStart;
             _notify.Checked = settings.NotificationEnabled;
             _sound.Checked = settings.SoundEnabled;
+            _holiday.Checked = settings.HolidayAware;
             _todayEnd.Value = string.IsNullOrEmpty(todayEnd) ? _end.Value : Today(todayEnd, 18, 0);
             _todayOnly.Checked = !string.IsNullOrEmpty(todayEnd);
             _error.Text = string.Empty;
@@ -231,7 +267,8 @@ namespace BreakFishApp.Controls
                 BreakMinutes = (int)_breakMinutes.Value,
                 AutoStart = _autoStart.Checked,
                 NotificationEnabled = _notify.Checked,
-                SoundEnabled = _sound.Checked
+                SoundEnabled = _sound.Checked,
+                HolidayAware = _holiday.Checked
             };
         }
 

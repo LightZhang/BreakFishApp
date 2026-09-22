@@ -26,6 +26,8 @@ namespace BreakFishApp.Models
 
         public bool SoundEnabled { get; set; }
 
+        public bool HolidayAware { get; set; }
+
         public static AppSettings CreateDefault()
         {
             return new AppSettings
@@ -40,7 +42,8 @@ namespace BreakFishApp.Models
                 BreakMinutes = 5,
                 AutoStart = false,
                 NotificationEnabled = true,
-                SoundEnabled = true
+                SoundEnabled = true,
+                HolidayAware = true
             };
         }
     }
