@@ -23,6 +23,7 @@ namespace BreakFishApp
                 Holiday_OnWorkday_IsIdle();
                 Makeup_OnWeekend_IsWorking();
                 HolidayDisabled_FallsBackToWorkDays();
+                BuiltinCalendar_NextHoliday_FromSep2026();
                 Console.WriteLine("self-test ok");
                 return 0;
             }
@@ -168,6 +169,16 @@ namespace BreakFishApp
             var scheduler = Create(clock, settings);
             scheduler.Tick();
             Assert(scheduler.GetCurrentState().Status == WorkStatus.Working, "holiday disabled should fall back to workdays");
+        }
+
+        private static void BuiltinCalendar_NextHoliday_FromSep2026()
+        {
+            // 今天是 9/22，下一个法定节假日应是中秋 9/25（不是国庆）
+            string name;
+            var next = HolidayCalendar.GetNextHoliday(new DateTime(2026, 9, 22), out name);
+            Assert(next.HasValue, "builtin next holiday missing");
+            AssertEqual("2026-09-25", next.Value.ToString("yyyy-MM-dd"), "next holiday date");
+            AssertEqual("中秋节", name, "next holiday name");
         }
 
         private static string FindKind(List<ScheduleEvent> plan, string kind, int index)

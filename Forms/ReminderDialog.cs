@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using BreakFishApp.Models;
 
@@ -118,6 +119,20 @@ namespace BreakFishApp.Forms
             Controls.Add(snooze);
             Controls.Add(skip);
             Controls.Add(tip);
+
+            Opacity = 0;
+        }
+
+        protected override async void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            // 淡入动画，不占用 UI Timer
+            for (double o = 0.2; o <= 1.0; o += 0.15)
+            {
+                Opacity = o;
+                await Task.Delay(25);
+            }
+            Opacity = 1.0;
         }
 
         private void OnChange(object sender, EventArgs e)

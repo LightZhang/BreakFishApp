@@ -60,6 +60,8 @@ namespace BreakFishApp
             };
             button.FlatAppearance.BorderSize = 0;
             button.FlatAppearance.MouseOverBackColor = AccentDeep;
+            button.FlatAppearance.MouseDownBackColor = Color.FromArgb(36, 80, 68);
+            button.Resize += delegate { ApplyRoundRegion(button, 8); };
             return button;
         }
 
@@ -77,6 +79,8 @@ namespace BreakFishApp
             };
             button.FlatAppearance.BorderSize = 0;
             button.FlatAppearance.MouseOverBackColor = Color.FromArgb(216, 230, 222);
+            button.FlatAppearance.MouseDownBackColor = Color.FromArgb(200, 218, 210);
+            button.Resize += delegate { ApplyRoundRegion(button, 8); };
             return button;
         }
 

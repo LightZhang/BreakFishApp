@@ -153,7 +153,7 @@ namespace BreakFishApp.Controls
 
             var holidayHint = new Label
             {
-                Text = "内置法定节假日与调休补班表，未覆盖的日期按工作日勾选判断",
+                Text = "内置 2025/2026 法定节假日与调休；联网时用接口刷新缓存",
                 Font = UiTheme.SmallFont,
                 ForeColor = UiTheme.Hint,
                 Location = new Point(36, y + 22),

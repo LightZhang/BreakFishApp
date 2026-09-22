@@ -41,9 +41,9 @@ namespace BreakFishApp.Services
                 }
             }
 
-            // 未命中缓存：同步返回"工作日"不阻塞，后台拉取接口填充缓存。
+            // 未命中缓存：先用内置表立即给出正确结果，同时后台拉接口刷新。
             EnsureFetching(date);
-            return new HolidayInfo { Kind = 0, Name = null };
+            return HolidayCalendar.GetInfo(date);
         }
 
         public DateTime? GetNextHoliday(DateTime from, out string name)
@@ -53,7 +53,7 @@ namespace BreakFishApp.Services
             var currentName = LookupName(today);
             var cursor = today.AddDays(1);
             var limit = today.AddYears(1);
-            while (cursor < limit)
+            while (cursor <= limit)
             {
                 var n = LookupName(cursor);
                 if (n != null && n != currentName)
@@ -64,9 +64,9 @@ namespace BreakFishApp.Services
                 cursor = cursor.AddDays(1);
             }
 
-            // 缓存里找不到，后台预取未来日期，下次即可命中。
+            // 缓存里找不到：立刻用内置表；同时后台预取，方便以后用接口结果。
             PrefetchNextHoliday(from);
-            return null;
+            return HolidayCalendar.GetNextHoliday(from, out name);
         }
 
         private static string LookupName(DateTime date)
@@ -76,9 +76,16 @@ namespace BreakFishApp.Services
             {
                 if (Cache.TryGetValue(date.Date.ToString("yyyy-MM-dd"), out info) && info != null && info.Kind == 1)
                 {
-                    return info.Name;
+                    return string.IsNullOrEmpty(info.Name) ? null : info.Name;
                 }
             }
+
+            info = HolidayCalendar.GetInfo(date);
+            if (info != null && info.Kind == 1 && !string.IsNullOrEmpty(info.Name))
+            {
+                return info.Name;
+            }
+
             return null;
         }
 

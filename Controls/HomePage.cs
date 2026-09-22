@@ -244,6 +244,20 @@ namespace BreakFishApp.Controls
             Controls.Add(brandRow);
         }
 
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            var rect = ClientRectangle;
+            using (var brush = new System.Drawing.Drawing2D.LinearGradientBrush(
+                rect,
+                Color.FromArgb(252, 249, 244),
+                Color.FromArgb(244, 240, 232),
+                System.Drawing.Drawing2D.LinearGradientMode.Vertical))
+            {
+                g.FillRectangle(brush, rect);
+            }
+        }
+
         public void Bind(ScheduleState state)
         {
             if (state == null)
@@ -260,6 +274,17 @@ namespace BreakFishApp.Controls
 
             _countdown.Text = TimeHelper.FormatCountdown(state.Countdown);
             _hint.Text = HintFor(state.Status);
+
+            // 最后 10 秒倒计时变橙红，提醒该起来活动了
+            var seconds = state.Countdown.TotalSeconds;
+            if (state.Status == WorkStatus.Working && seconds > 0 && seconds <= 10)
+            {
+                _countdown.ForeColor = UiTheme.Break;
+            }
+            else
+            {
+                _countdown.ForeColor = UiTheme.Ink;
+            }
 
             _nowLabel.Text = "现在 " + state.Now.ToString("yyyy-MM-dd HH:mm:ss");
             _offLabel.Text = FormatOff(state);

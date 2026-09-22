@@ -69,10 +69,19 @@ namespace BreakFishApp.Controls
         {
             var g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
-            using (var pen = new Pen(_border, 1))
-            using (var path = RoundPath(ClientRectangle, _radius))
+            var rect = ClientRectangle;
+            using (var path = RoundPath(rect, _radius))
             {
-                g.DrawPath(pen, path);
+                // 顶部高光
+                using (var topBrush = new SolidBrush(Color.FromArgb(8, 255, 255, 255)))
+                {
+                    g.FillPath(topBrush, path);
+                }
+                // 边框
+                using (var pen = new Pen(_border, 1))
+                {
+                    g.DrawPath(pen, path);
+                }
             }
             base.OnPaint(e);
         }
