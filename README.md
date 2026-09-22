@@ -4,11 +4,20 @@
 > 中文名：摸鱼一下  
 > 技术：C# + .NET Framework + WinForms  
 > 平台：Windows  
-> 类型：桌面托盘应用
+> 类型：桌面托盘应用  
+> 体积：约 258 KB（单个 exe）
+
+## 下载地址：
+  https://github.com/LightZhang/BreakFishApp/blob/main/bin/Debug/BreakFishApp.exe  
+  体积约 258 KB，绿色单文件，不需要安装。
 
 FishBreak 是一款安静待在 Windows 托盘里的工作日休息助手。你只需设好上班、下班和午休时间，它就会按工作节奏，在合适的时候提醒你起来走走、看看远处、放松肩颈、喝口水——然后继续干活，直到下班自动收工。
 
 它不替代日程表，也不催你「提高效率」。它只做一件事：**帮你把今天该动一下的时刻安排好，少想、少点、少被打扰。**
+
+<p align="center">
+  <img src="Assets/home.png" alt="FishBreak 首页：正在工作、倒计时与下一步提醒" width="360" />
+</p>
 
 ---
 
@@ -197,6 +206,8 @@ UserControl
 # 六、首页
 
 首页是程序最重要的页面。
+
+![FishBreak 首页](Assets/home.png)
 
 建议：
 
