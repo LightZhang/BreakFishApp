@@ -14,6 +14,7 @@ namespace BreakFishApp.Services
         private readonly IClock _clock;
         private readonly Action<DailyState> _saveDaily;
         private readonly ReminderSelector _selector;
+        private readonly IHolidayProvider _holidays;
 
         private AppSettings _settings;
         private DailyState _daily;
@@ -29,11 +30,17 @@ namespace BreakFishApp.Services
         private DateTime _currentDay;
 
         public WorkScheduler(AppSettings settings, DailyState daily, IClock clock, Action<DailyState> saveDaily)
+            : this(settings, daily, clock, saveDaily, new HolidayApiService())
+        {
+        }
+
+        public WorkScheduler(AppSettings settings, DailyState daily, IClock clock, Action<DailyState> saveDaily, IHolidayProvider holidays)
         {
             _settings = settings ?? AppSettings.CreateDefault();
             _daily = daily ?? new DailyState();
             _clock = clock ?? new SystemClock();
             _saveDaily = saveDaily;
+            _holidays = holidays ?? new HolidayApiService();
             _selector = new ReminderSelector();
             _lastTick = _clock.Now;
             _currentDay = _clock.Now.Date;
@@ -85,6 +92,17 @@ namespace BreakFishApp.Services
             var nextAt = GetDisplayNextAt(now);
             var countdown = nextAt.HasValue && nextAt.Value > now ? nextAt.Value - now : TimeSpan.Zero;
 
+            string holidayName = null;
+            DateTime? nextHoliday = null;
+            if (_holidays != null)
+            {
+                nextHoliday = _holidays.GetNextHoliday(now, out holidayName);
+            }
+            if (!nextHoliday.HasValue)
+            {
+                holidayName = null;
+            }
+
             return new ScheduleState
             {
                 Status = _status,
@@ -98,7 +116,11 @@ namespace BreakFishApp.Services
                 ReminderCount = _daily.ReminderCount,
                 SkipCount = _daily.SkipCount,
                 ReminderPending = _reminderPending,
-                TodayEndTime = _daily.TodayEndTime
+                TodayEndTime = _daily.TodayEndTime,
+                Now = now,
+                EndAt = IsWorkDay(now) ? EndAt(now) : (DateTime?)null,
+                NextHolidayDate = nextHoliday,
+                NextHolidayName = holidayName
             };
         }
 
@@ -489,16 +511,20 @@ namespace BreakFishApp.Services
         private bool IsWorkDay(DateTime now)
         {
             // 启用节假日识别时：调休补班日即使周末也算工作日；法定节假日即使工作日也不算工作日。
-            if (_settings.HolidayAware)
+            if (_settings.HolidayAware && _holidays != null)
             {
-                if (HolidayCalendar.IsMakeupWorkday(now))
+                var info = _holidays.GetInfo(now);
+                if (info != null)
                 {
-                    return true;
-                }
-
-                if (HolidayCalendar.IsHoliday(now))
-                {
-                    return false;
+                    if (info.Kind == 1)
+                    {
+                        return false;
+                    }
+                    if (info.Kind == 2)
+                    {
+                        return true;
+                    }
+                    // Kind == 0：法定工作日，落到下面按用户勾选判断
                 }
             }
 

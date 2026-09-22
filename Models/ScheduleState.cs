@@ -28,5 +28,13 @@ namespace BreakFishApp.Models
         public bool ReminderPending { get; set; }
 
         public string TodayEndTime { get; set; }
+
+        public DateTime Now { get; set; }
+
+        public DateTime? EndAt { get; set; }
+
+        public DateTime? NextHolidayDate { get; set; }
+
+        public string NextHolidayName { get; set; }
     }
 }

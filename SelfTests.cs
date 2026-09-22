@@ -133,12 +133,12 @@ namespace BreakFishApp
 
         private static WorkScheduler Create(FakeClock clock)
         {
-            return new WorkScheduler(AppSettings.CreateDefault(), new DailyState { Date = clock.Now.ToString("yyyy-MM-dd") }, clock, delegate { });
+            return new WorkScheduler(AppSettings.CreateDefault(), new DailyState { Date = clock.Now.ToString("yyyy-MM-dd") }, clock, delegate { }, new FakeHolidayProvider());
         }
 
         private static WorkScheduler Create(FakeClock clock, AppSettings settings)
         {
-            return new WorkScheduler(settings, new DailyState { Date = clock.Now.ToString("yyyy-MM-dd") }, clock, delegate { });
+            return new WorkScheduler(settings, new DailyState { Date = clock.Now.ToString("yyyy-MM-dd") }, clock, delegate { }, new FakeHolidayProvider());
         }
 
         private static void Holiday_OnWorkday_IsIdle()
@@ -226,6 +226,29 @@ namespace BreakFishApp
             if (!condition)
             {
                 throw new Exception(name);
+            }
+        }
+
+        private sealed class FakeHolidayProvider : IHolidayProvider
+        {
+            public HolidayInfo GetInfo(DateTime date)
+            {
+                var d = date.Date;
+                if (d >= new DateTime(2026, 10, 1) && d <= new DateTime(2026, 10, 8))
+                {
+                    return new HolidayInfo { Kind = 1, Name = "国庆节" };
+                }
+                if (d == new DateTime(2026, 10, 10))
+                {
+                    return new HolidayInfo { Kind = 2, Name = null };
+                }
+                return new HolidayInfo { Kind = 0, Name = null };
+            }
+
+            public DateTime? GetNextHoliday(DateTime from, out string name)
+            {
+                name = "国庆节";
+                return new DateTime(2026, 10, 1);
             }
         }
     }

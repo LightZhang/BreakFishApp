@@ -14,6 +14,9 @@ namespace BreakFishApp.Controls
         private readonly Label _badgeText;
         private readonly Label _countdown;
         private readonly Label _hint;
+        private readonly Label _nowLabel;
+        private readonly Label _offLabel;
+        private readonly Label _holidayLabel;
         private readonly RoundPanel _card;
         private readonly Label _nextLabel;
         private readonly Label _nextTitle;
@@ -111,6 +114,44 @@ namespace BreakFishApp.Controls
                 Height = 22
             };
 
+            var clockBar = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 30,
+                Margin = new Padding(0, 4, 0, 0)
+            };
+            _nowLabel = new Label
+            {
+                Text = "现在 --:--",
+                Font = UiTheme.UiFont,
+                ForeColor = UiTheme.Ink,
+                Dock = DockStyle.Left,
+                AutoSize = true,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            _offLabel = new Label
+            {
+                Text = "距下班 --",
+                Font = UiTheme.UiFont,
+                ForeColor = UiTheme.Mute,
+                Dock = DockStyle.Right,
+                AutoSize = true,
+                TextAlign = ContentAlignment.MiddleRight
+            };
+            clockBar.Controls.Add(_nowLabel);
+            clockBar.Controls.Add(_offLabel);
+
+            _holidayLabel = new Label
+            {
+                Text = "距下一个节假日 --",
+                Font = UiTheme.SmallFont,
+                ForeColor = UiTheme.Accent,
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Top,
+                Height = 22
+            };
+
             _card = new RoundPanel
             {
                 Radius = UiTheme.Radius,
@@ -194,6 +235,8 @@ namespace BreakFishApp.Controls
             Controls.Add(_statsTitle);
             Controls.Add(_rest);
             Controls.Add(_card);
+            Controls.Add(_holidayLabel);
+            Controls.Add(clockBar);
             Controls.Add(_hint);
             Controls.Add(_countdown);
             Controls.Add(_badge);
@@ -213,8 +256,14 @@ namespace BreakFishApp.Controls
             _badge.BackColor = Tint(badgeColor);
             _badgeText.ForeColor = badgeColor;
 
+            _sub.Text = SubtitleFor(state);
+
             _countdown.Text = TimeHelper.FormatCountdown(state.Countdown);
             _hint.Text = HintFor(state.Status);
+
+            _nowLabel.Text = "现在 " + state.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            _offLabel.Text = FormatOff(state);
+            _holidayLabel.Text = FormatHoliday(state);
 
             if (state.NextReminder != null)
             {
@@ -274,6 +323,84 @@ namespace BreakFishApp.Controls
             panel.Controls.Add(cap);
             grid.Controls.Add(panel, col, 0);
             return val;
+        }
+
+        private static string SubtitleFor(ScheduleState state)
+        {
+            if (state == null)
+            {
+                return "记得照顾好自己，别太累啦";
+            }
+
+            switch (state.Status)
+            {
+                case WorkStatus.Working:
+                    return PickByTime(state.Now, "上午好，记得喝水活动一下", "中午好，别太赶啦", "下午好，再坚持一会儿", "还在加班吗，别太累啦");
+                case WorkStatus.Breaking:
+                    return "趁现在起来活动一下吧";
+                case WorkStatus.Lunch:
+                    return "先去吃饭，休息一会儿";
+                case WorkStatus.Paused:
+                    return "暂停中，忙完再继续";
+                case WorkStatus.Finished:
+                    return "今天辛苦啦，好好休息";
+                default:
+                    if (!IsWorkDay(state))
+                    {
+                        return "今天休息，放松一下";
+                    }
+                    return "还没到上班时间，慢慢来";
+            }
+        }
+
+        private static bool IsWorkDay(ScheduleState state)
+        {
+            return state.EndAt.HasValue;
+        }
+
+        private static string PickByTime(DateTime now, string morning, string noon, string afternoon, string night)
+        {
+            var h = now.Hour;
+            if (h < 11) return morning;
+            if (h < 13) return noon;
+            if (h < 18) return afternoon;
+            return night;
+        }
+
+        private static string FormatOff(ScheduleState state)
+        {
+            if (!state.EndAt.HasValue || state.EndAt.Value <= state.Now)
+            {
+                return "已下班";
+            }
+
+            var left = state.EndAt.Value - state.Now;
+            var hours = (int)left.TotalHours;
+            var minutes = left.Minutes;
+            if (hours > 0)
+            {
+                return "距下班 " + hours + "h" + minutes.ToString("00") + "m";
+            }
+            return "距下班 " + minutes + "m";
+        }
+
+        private static string FormatHoliday(ScheduleState state)
+        {
+            if (!state.NextHolidayDate.HasValue || string.IsNullOrEmpty(state.NextHolidayName))
+            {
+                return "距下一个节假日 --";
+            }
+
+            var days = (int)(state.NextHolidayDate.Value.Date - state.Now.Date).TotalDays;
+            if (days <= 0)
+            {
+                return "今天是 " + state.NextHolidayName;
+            }
+            if (days == 1)
+            {
+                return "明天是 " + state.NextHolidayName;
+            }
+            return "距" + state.NextHolidayName + "还有 " + days + " 天";
         }
 
         private static string HintFor(WorkStatus status)
