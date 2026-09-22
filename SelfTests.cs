@@ -24,6 +24,8 @@ namespace BreakFishApp
                 Makeup_OnWeekend_IsWorking();
                 HolidayDisabled_FallsBackToWorkDays();
                 BuiltinCalendar_NextHoliday_FromSep2026();
+                HolidayYearParser_MapJson_OffAndMakeup();
+                HolidayYearParser_DaysArrayJson();
                 Console.WriteLine("self-test ok");
                 return 0;
             }
@@ -179,6 +181,31 @@ namespace BreakFishApp
             Assert(next.HasValue, "builtin next holiday missing");
             AssertEqual("2026-09-25", next.Value.ToString("yyyy-MM-dd"), "next holiday date");
             AssertEqual("中秋节", name, "next holiday name");
+        }
+
+        private static void HolidayYearParser_MapJson_OffAndMakeup()
+        {
+            var json = "{\"2026-09-20\":{\"date\":\"2026-09-20\",\"name\":\"国庆节\",\"isOffDay\":false}," +
+                       "\"2026-09-25\":{\"date\":\"2026-09-25\",\"name\":\"中秋节\",\"isOffDay\":true}," +
+                       "\"2026-10-10\":{\"date\":\"2026-10-10\",\"name\":\"国庆节\",\"isOffDay\":false}}";
+            var map = HolidayYearParser.Parse(json);
+            Assert(map["2026-09-25"].Kind == 1, "mid-autumn should be off");
+            AssertEqual("中秋节", map["2026-09-25"].Name, "mid-autumn name");
+            Assert(map["2026-10-10"].Kind == 2, "national makeup should be work");
+            Assert(map["2026-09-20"].Kind == 2, "sep20 makeup should be work");
+            string nextName;
+            var next = HolidayYearParser.GetNextHoliday(map, new DateTime(2026, 9, 22), out nextName);
+            AssertEqual("2026-09-25", next.Value.ToString("yyyy-MM-dd"), "parser next date");
+            AssertEqual("中秋节", nextName, "parser next name");
+        }
+
+        private static void HolidayYearParser_DaysArrayJson()
+        {
+            var json = "{\"year\":2026,\"days\":[{\"name\":\"元旦\",\"date\":\"2026-01-01\",\"isOffDay\":true}," +
+                       "{\"name\":\"元旦\",\"date\":\"2026-01-04\",\"isOffDay\":false}]}";
+            var map = HolidayYearParser.Parse(json);
+            Assert(map["2026-01-01"].Kind == 1, "new year off");
+            Assert(map["2026-01-04"].Kind == 2, "new year makeup");
         }
 
         private static string FindKind(List<ScheduleEvent> plan, string kind, int index)

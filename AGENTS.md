@@ -11,6 +11,7 @@
 - C# / .NET Framework 4.7.2
 - WinForms（`NotifyIcon`、`System.Windows.Forms.Timer`）
 - 配置：`%AppData%\FishBreak\settings.json`（`JavaScriptSerializer`）
+- 节假日：按年拉取 `holiday-cn`（`date` / `name` / `isOffDay`），缓存为 `%AppData%\FishBreak\holiday-{年}.json`
 - 开机启动：当前用户 `Run` 注册表，不需要管理员权限
 
 不要引入数据库、Web、较新 C# 语法（file-scoped namespace、target-typed `new` 等）。

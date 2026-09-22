@@ -75,6 +75,8 @@
     <Compile Include="Utils\JsonFile.cs" />
     <Compile Include="Services\IClock.cs" />
     <Compile Include="Services\IHolidayProvider.cs" />
+    <Compile Include="Services\HolidayCalendar.cs" />
+    <Compile Include="Services\HolidayYearParser.cs" />
     <Compile Include="Services\HolidayApiService.cs" />
     <Compile Include="Services\ScheduleBuilder.cs" />
     <Compile Include="Services\ReminderSelector.cs" />
