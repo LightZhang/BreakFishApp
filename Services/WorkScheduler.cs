@@ -221,8 +221,10 @@ namespace BreakFishApp.Services
             _endNotified = false;
             _reminderPending = false;
             _breakUntil = null;
+            _daily = new DailyState { Date = now.Date.ToString("yyyy-MM-dd") };
             RebuildPlan();
             InitializeNext();
+            Persist();
         }
 
         private void Accumulate(DateTime now)

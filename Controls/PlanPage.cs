@@ -24,6 +24,15 @@ namespace BreakFishApp.Controls
                 Height = 32
             };
 
+            var hint = new Label
+            {
+                Text = "这是今天给你安排的活动节奏，跟着走就好",
+                Font = UiTheme.SmallFont,
+                ForeColor = UiTheme.Mute,
+                Dock = DockStyle.Top,
+                Height = 22
+            };
+
             _list = new FlowLayoutPanel
             {
                 Dock = DockStyle.Fill,
@@ -34,6 +43,7 @@ namespace BreakFishApp.Controls
             };
 
             Controls.Add(_list);
+            Controls.Add(hint);
             Controls.Add(title);
         }
 
@@ -51,12 +61,23 @@ namespace BreakFishApp.Controls
             foreach (var item in state.TodayPlan)
             {
                 var passed = item.At <= now;
-                var row = new Panel
+                var row = new RoundPanel
                 {
+                    Radius = 10,
                     Width = _list.ClientSize.Width - 28,
-                    Height = 46,
-                    Margin = new Padding(0, 0, 0, 8),
-                    BackColor = passed ? Color.FromArgb(243, 241, 236) : UiTheme.Panel
+                    Height = 50,
+                    Margin = new Padding(0, 0, 0, 10),
+                    BackColor = passed ? UiTheme.PanelDeep : UiTheme.Panel,
+                    BorderColor = passed ? Color.Transparent : UiTheme.Line
+                };
+
+                var dot = new Label
+                {
+                    Text = "●",
+                    Font = new Font("Microsoft YaHei UI", 10F),
+                    ForeColor = passed ? UiTheme.Hint : UiTheme.Accent,
+                    Location = new Point(14, 16),
+                    AutoSize = true
                 };
 
                 var time = new Label
@@ -64,7 +85,7 @@ namespace BreakFishApp.Controls
                     Text = item.At.ToString("HH:mm"),
                     Font = UiTheme.CaptionFont,
                     ForeColor = passed ? UiTheme.Mute : UiTheme.Ink,
-                    Location = new Point(12, 12),
+                    Location = new Point(34, 14),
                     AutoSize = true
                 };
 
@@ -73,10 +94,11 @@ namespace BreakFishApp.Controls
                     Text = (item.Emoji ?? "") + "  " + item.Title,
                     Font = UiTheme.UiFont,
                     ForeColor = passed ? UiTheme.Mute : UiTheme.Ink,
-                    Location = new Point(78, 13),
+                    Location = new Point(96, 16),
                     AutoSize = true
                 };
 
+                row.Controls.Add(dot);
                 row.Controls.Add(time);
                 row.Controls.Add(text);
                 _list.Controls.Add(row);

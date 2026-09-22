@@ -1,25 +1,50 @@
+using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace BreakFishApp
 {
     public static class UiTheme
     {
-        public static readonly Color Paper = Color.FromArgb(247, 244, 239);
-        public static readonly Color Panel = Color.FromArgb(255, 252, 247);
-        public static readonly Color Accent = Color.FromArgb(47, 111, 94);
-        public static readonly Color AccentSoft = Color.FromArgb(232, 240, 236);
-        public static readonly Color Ink = Color.FromArgb(36, 40, 38);
-        public static readonly Color Mute = Color.FromArgb(110, 116, 112);
-        public static readonly Color Line = Color.FromArgb(226, 220, 210);
-        public static readonly Color Nav = Color.FromArgb(239, 234, 226);
+        // 底色：暖米白系，柔和不刺眼
+        public static readonly Color Paper = Color.FromArgb(248, 245, 240);
+        public static readonly Color Panel = Color.FromArgb(255, 253, 249);
+        public static readonly Color PanelDeep = Color.FromArgb(243, 239, 231);
+        public static readonly Color Nav = Color.FromArgb(241, 236, 228);
 
+        // 强调：温润的青绿，不饱和
+        public static readonly Color Accent = Color.FromArgb(58, 120, 100);
+        public static readonly Color AccentSoft = Color.FromArgb(229, 239, 234);
+        public static readonly Color AccentDeep = Color.FromArgb(42, 92, 78);
+
+        // 状态色
+        public static readonly Color Work = Color.FromArgb(58, 120, 100);
+        public static readonly Color Break = Color.FromArgb(214, 138, 89);
+        public static readonly Color Lunch = Color.FromArgb(168, 130, 196);
+        public static readonly Color Off = Color.FromArgb(150, 150, 145);
+
+        // 文字
+        public static readonly Color Ink = Color.FromArgb(40, 44, 41);
+        public static readonly Color Mute = Color.FromArgb(126, 130, 124);
+        public static readonly Color Hint = Color.FromArgb(168, 170, 164);
+        public static readonly Color Line = Color.FromArgb(228, 222, 212);
+        public static readonly Color Danger = Color.FromArgb(190, 92, 78);
+
+        // 字体
+        public static readonly Font BrandFont = new Font("Microsoft YaHei UI", 13F, FontStyle.Bold);
         public static readonly Font TitleFont = new Font("Microsoft YaHei UI", 18F, FontStyle.Bold);
-        public static readonly Font StatusFont = new Font("Microsoft YaHei UI", 14F, FontStyle.Bold);
-        public static readonly Font ClockFont = new Font("Consolas", 36F, FontStyle.Bold);
+        public static readonly Font StatusFont = new Font("Microsoft YaHei UI", 15F, FontStyle.Bold);
+        public static readonly Font ClockFont = new Font("Consolas", 40F, FontStyle.Bold);
         public static readonly Font UiFont = new Font("Microsoft YaHei UI", 9.5F);
         public static readonly Font SmallFont = new Font("Microsoft YaHei UI", 9F);
         public static readonly Font CaptionFont = new Font("Microsoft YaHei UI", 11F, FontStyle.Bold);
+        public static readonly Font ValueFont = new Font("Microsoft YaHei UI", 22F, FontStyle.Bold);
+
+        // 间距
+        public const int Pad = 24;
+        public const int Radius = 12;
 
         public static Button PrimaryButton(string text)
         {
@@ -30,10 +55,11 @@ namespace BreakFishApp
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Font = CaptionFont,
-                Height = 40,
+                Height = 42,
                 Cursor = Cursors.Hand
             };
             button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.MouseOverBackColor = AccentDeep;
             return button;
         }
 
@@ -46,11 +72,34 @@ namespace BreakFishApp
                 ForeColor = Accent,
                 FlatStyle = FlatStyle.Flat,
                 Font = UiFont,
-                Height = 32,
+                Height = 34,
                 Cursor = Cursors.Hand
             };
             button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.MouseOverBackColor = Color.FromArgb(216, 230, 222);
             return button;
+        }
+
+        /// <summary>给控件套一个圆角区域，固定尺寸时调用一次即可。</summary>
+        public static void ApplyRoundRegion(Control target, int radius)
+        {
+            if (target == null || target.Width <= 0 || target.Height <= 0)
+            {
+                return;
+            }
+
+            using (var path = new GraphicsPath())
+            {
+                var r = radius;
+                var w = target.Width;
+                var h = target.Height;
+                path.AddArc(0, 0, r, r, 180, 90);
+                path.AddArc(w - r, 0, r, r, 270, 90);
+                path.AddArc(w - r, h - r, r, r, 0, 90);
+                path.AddArc(0, h - r, r, r, 90, 90);
+                path.CloseFigure();
+                target.Region = new Region(path);
+            }
         }
     }
 }

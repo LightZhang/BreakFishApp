@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("BreakFishApp")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("FishBreak")]
+[assembly: AssemblyDescription("摸鱼一下 — 工作休息提醒")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("BreakFishApp")]
+[assembly: AssemblyProduct("FishBreak")]
 [assembly: AssemblyCopyright("Copyright ©  2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

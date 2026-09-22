@@ -131,13 +131,15 @@ namespace BreakFishApp.Forms
             {
                 Text = text,
                 Location = new Point(8, y),
-                Size = new Size(72, 32),
+                Size = new Size(72, 34),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.Transparent,
                 ForeColor = UiTheme.Ink,
+                Font = UiTheme.UiFont,
                 Cursor = Cursors.Hand
             };
             button.FlatAppearance.BorderSize = 0;
+            button.FlatAppearance.MouseOverBackColor = UiTheme.AccentSoft;
             return button;
         }
 

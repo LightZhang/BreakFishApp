@@ -33,6 +33,7 @@ namespace BreakFishApp.Controls
             BackColor = UiTheme.Paper;
             Dock = DockStyle.Fill;
             AutoScroll = true;
+            AutoScrollMinSize = new Size(0, 760);
             Padding = new Padding(20);
 
             var title = new Label
@@ -45,7 +46,17 @@ namespace BreakFishApp.Controls
             };
             Controls.Add(title);
 
-            var y = 52;
+            var subtitle = new Label
+            {
+                Text = "设好上下班和午休，剩下的交给我就行",
+                Font = UiTheme.SmallFont,
+                ForeColor = UiTheme.Mute,
+                Location = new Point(20, 38),
+                AutoSize = true
+            };
+            Controls.Add(subtitle);
+
+            var y = 70;
             Controls.Add(LabelAt("工作日", y));
             y += 24;
             var names = new[] { "周一", "周二", "周三", "周四", "周五", "周六", "周日" };
@@ -125,15 +136,15 @@ namespace BreakFishApp.Controls
             Controls.Add(_todayOnly);
 
             y += 40;
-            var save = UiTheme.PrimaryButton("保存");
+            var save = UiTheme.PrimaryButton("保存设置");
             save.Location = new Point(20, y);
-            save.Width = 120;
+            save.Width = 140;
             save.Click += OnSave;
             Controls.Add(save);
 
             var reset = UiTheme.GhostButton("恢复默认");
-            reset.Location = new Point(150, y);
-            reset.Width = 100;
+            reset.Location = new Point(170, y);
+            reset.Width = 110;
             reset.Click += delegate
             {
                 if (ResetRequested != null)

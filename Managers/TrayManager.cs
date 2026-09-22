@@ -13,7 +13,6 @@ namespace BreakFishApp.Managers
         private readonly ToolStripMenuItem _statusItem;
         private readonly ToolStripMenuItem _nextItem;
         private readonly Func<ScheduleState> _state;
-        private readonly Icon _icon;
         private bool _disposed;
 
         public TrayManager(
@@ -28,7 +27,6 @@ namespace BreakFishApp.Managers
             Action pauseToday,
             Action exit)
         {
-            _icon = icon;
             _state = state;
             _menu = new ContextMenuStrip();
             _menu.Font = UiTheme.UiFont;

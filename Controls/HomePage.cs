@@ -8,13 +8,18 @@ namespace BreakFishApp.Controls
 {
     public sealed class HomePage : UserControl
     {
-        private readonly Label _status;
+        private readonly Label _brand;
+        private readonly Label _sub;
+        private readonly RoundPanel _badge;
+        private readonly Label _badgeText;
         private readonly Label _countdown;
         private readonly Label _hint;
+        private readonly RoundPanel _card;
+        private readonly Label _nextLabel;
         private readonly Label _nextTitle;
         private readonly Label _nextMessage;
-        private readonly Label _today;
         private readonly Button _rest;
+        private readonly Label _today;
 
         public event Action RestNow;
 
@@ -23,28 +28,46 @@ namespace BreakFishApp.Controls
             BackColor = UiTheme.Paper;
             Font = UiTheme.UiFont;
             Dock = DockStyle.Fill;
-            Padding = new Padding(28, 20, 28, 20);
+            Padding = new Padding(28, 22, 28, 18);
 
-            var brand = new Label
+            _brand = new Label
             {
                 Text = "🐟  FishBreak",
-                Font = UiTheme.CaptionFont,
+                Font = UiTheme.BrandFont,
                 ForeColor = UiTheme.Ink,
                 AutoSize = true,
-                Location = new Point(28, 18)
+                Dock = DockStyle.Top,
+                Height = 30
             };
 
-            _status = new Label
+            _sub = new Label
+            {
+                Text = "记得照顾好自己，别太累啦",
+                Font = UiTheme.SmallFont,
+                ForeColor = UiTheme.Mute,
+                AutoSize = true,
+                Dock = DockStyle.Top,
+                Height = 20
+            };
+
+            _badge = new RoundPanel
+            {
+                Radius = 14,
+                BackColor = UiTheme.AccentSoft,
+                Size = new Size(96, 28),
+                Dock = DockStyle.Top,
+                Height = 36,
+                Margin = new Padding(0, 16, 0, 0)
+            };
+            _badgeText = new Label
             {
                 Text = "正在工作",
-                Font = UiTheme.StatusFont,
+                Font = UiTheme.UiFont,
                 ForeColor = UiTheme.Accent,
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Top,
-                Height = 40,
-                Padding = new Padding(0, 36, 0, 0)
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleCenter
             };
+            _badge.Controls.Add(_badgeText);
 
             _countdown = new Label
             {
@@ -54,7 +77,8 @@ namespace BreakFishApp.Controls
                 AutoSize = false,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Dock = DockStyle.Top,
-                Height = 72
+                Height = 76,
+                Margin = new Padding(0, 6, 0, 0)
             };
 
             _hint = new Label
@@ -65,19 +89,20 @@ namespace BreakFishApp.Controls
                 AutoSize = false,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Dock = DockStyle.Top,
-                Height = 24
+                Height = 22
             };
 
-            var card = new Panel
+            _card = new RoundPanel
             {
+                Radius = UiTheme.Radius,
                 BackColor = UiTheme.Panel,
-                Dock = DockStyle.Top,
-                Height = 168,
-                Padding = new Padding(18),
-                Margin = new Padding(0, 16, 0, 0)
+                BorderColor = UiTheme.Line,
+                Dock = DockStyle.Fill,
+                Padding = new Padding(18, 16, 18, 16),
+                Margin = new Padding(0, 18, 0, 0)
             };
 
-            var nextLabel = new Label
+            _nextLabel = new Label
             {
                 Text = "下一步",
                 Font = UiTheme.SmallFont,
@@ -85,26 +110,28 @@ namespace BreakFishApp.Controls
                 Dock = DockStyle.Top,
                 Height = 22
             };
-
             _nextTitle = new Label
             {
-                Text = "起来走走",
+                Text = "🚶  起来走走",
                 Font = UiTheme.CaptionFont,
                 ForeColor = UiTheme.Ink,
                 Dock = DockStyle.Top,
-                Height = 28
+                Height = 30,
+                Margin = new Padding(0, 4, 0, 0)
             };
-
             _nextMessage = new Label
             {
                 Text = "站起来活动 3～5 分钟",
+                Font = UiTheme.UiFont,
                 ForeColor = UiTheme.Mute,
                 Dock = DockStyle.Top,
-                Height = 48
+                Height = 48,
+                Margin = new Padding(0, 2, 0, 0)
             };
 
-            _rest = UiTheme.PrimaryButton("立即休息");
+            _rest = UiTheme.PrimaryButton("立即休息一下");
             _rest.Dock = DockStyle.Bottom;
+            _rest.Height = 44;
             _rest.Click += delegate
             {
                 if (RestNow != null)
@@ -113,14 +140,10 @@ namespace BreakFishApp.Controls
                 }
             };
 
-            card.Controls.Add(_rest);
-            card.Controls.Add(_nextMessage);
-            card.Controls.Add(_nextTitle);
-            card.Controls.Add(nextLabel);
-
             _today = new Label
             {
                 Text = "今日：工作 0m · 休息 0m",
+                Font = UiTheme.SmallFont,
                 ForeColor = UiTheme.Mute,
                 AutoSize = false,
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -128,15 +151,17 @@ namespace BreakFishApp.Controls
                 Height = 28
             };
 
-            var body = new Panel { Dock = DockStyle.Fill, Padding = new Padding(0, 12, 0, 8) };
-            body.Controls.Add(card);
-            body.Controls.Add(_hint);
-            body.Controls.Add(_countdown);
-            body.Controls.Add(_status);
+            _card.Controls.Add(_nextMessage);
+            _card.Controls.Add(_nextTitle);
+            _card.Controls.Add(_nextLabel);
 
             Controls.Add(_today);
-            Controls.Add(body);
-            Controls.Add(brand);
+            Controls.Add(_card);
+            Controls.Add(_hint);
+            Controls.Add(_countdown);
+            Controls.Add(_badge);
+            Controls.Add(_sub);
+            Controls.Add(_brand);
         }
 
         public void Bind(ScheduleState state)
@@ -146,34 +171,13 @@ namespace BreakFishApp.Controls
                 return;
             }
 
-            _status.Text = state.StatusText;
-            _countdown.Text = TimeHelper.FormatCountdown(state.Countdown);
+            _badgeText.Text = state.StatusText ?? "正在工作";
+            var badgeColor = StatusColor(state.Status);
+            _badge.BackColor = Tint(badgeColor);
+            _badgeText.ForeColor = badgeColor;
 
-            if (state.Status == WorkStatus.Breaking)
-            {
-                _hint.Text = "距离休息结束";
-            }
-            else if (state.Status == WorkStatus.Lunch)
-            {
-                _hint.Text = "距离午休结束";
-            }
-            else if (state.Status == WorkStatus.Idle)
-            {
-                _hint.Text = "距离上班";
-            }
-            else if (state.Status == WorkStatus.Finished)
-            {
-                _hint.Text = "今天已经结束";
-                _countdown.Text = "--:--";
-            }
-            else if (state.Status == WorkStatus.Paused)
-            {
-                _hint.Text = "距离恢复提醒";
-            }
-            else
-            {
-                _hint.Text = "距离下一次提醒";
-            }
+            _countdown.Text = TimeHelper.FormatCountdown(state.Countdown);
+            _hint.Text = HintFor(state.Status);
 
             if (state.NextReminder != null)
             {
@@ -183,17 +187,59 @@ namespace BreakFishApp.Controls
             else if (state.Status == WorkStatus.Finished)
             {
                 _nextTitle.Text = "🏠  下班啦";
-                _nextMessage.Text = "今天的安排已经结束。";
+                _nextMessage.Text = "今天的安排已经结束，好好休息吧。";
             }
             else
             {
                 _nextTitle.Text = "暂无提醒";
-                _nextMessage.Text = "当前不在工作提醒时段。";
+                _nextMessage.Text = "当前不在工作提醒时段，放松一下。";
             }
 
             _today.Text = "今日：工作 " + TimeHelper.FormatDuration(state.WorkedSeconds) +
                           " · 休息 " + TimeHelper.FormatDuration(state.BreakSeconds);
             _rest.Enabled = state.Status == WorkStatus.Working;
+        }
+
+        private static string HintFor(WorkStatus status)
+        {
+            switch (status)
+            {
+                case WorkStatus.Breaking:
+                    return "距离休息结束";
+                case WorkStatus.Lunch:
+                    return "距离午休结束";
+                case WorkStatus.Idle:
+                    return "距离上班";
+                case WorkStatus.Finished:
+                    return "今天已经结束，辛苦啦";
+                case WorkStatus.Paused:
+                    return "已暂停，距离恢复提醒";
+                default:
+                    return "距离下一次提醒";
+            }
+        }
+
+        private static Color StatusColor(WorkStatus status)
+        {
+            switch (status)
+            {
+                case WorkStatus.Breaking:
+                    return UiTheme.Break;
+                case WorkStatus.Lunch:
+                    return UiTheme.Lunch;
+                case WorkStatus.Finished:
+                    return UiTheme.Off;
+                case WorkStatus.Paused:
+                    return UiTheme.Mute;
+                default:
+                    return UiTheme.Work;
+            }
+        }
+
+        private static Color Tint(Color c)
+        {
+            // 把状态色调成柔和底色：混入大量白
+            return Color.FromArgb((c.R + 255 * 3) / 4, (c.G + 255 * 3) / 4, (c.B + 255 * 3) / 4);
         }
     }
 }
