@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BreakFishApp.Managers;
 using BreakFishApp.Models;
 
 namespace BreakFishApp.Forms
@@ -41,6 +42,7 @@ namespace BreakFishApp.Forms
             ClientSize = new Size(380, 340);
             BackColor = UiTheme.Paper;
             Font = UiTheme.UiFont;
+            Icon = AppIconFactory.Create();
 
             _emoji = new Label
             {

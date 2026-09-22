@@ -1,6 +1,5 @@
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using BreakFishApp.Models;
 
@@ -148,30 +147,35 @@ namespace BreakFishApp.Managers
     {
         public static Icon Create()
         {
-            using (var bmp = new Bitmap(32, 32))
-            using (var g = Graphics.FromImage(bmp))
+            return FromResource(32);
+        }
+
+        public static Icon CreateTray()
+        {
+            int size = SystemInformation.SmallIconSize.Width;
+            if (size < 16)
             {
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-                g.Clear(Color.Transparent);
-                using (var brush = new SolidBrush(UiTheme.Accent))
-                {
-                    g.FillEllipse(brush, 1, 1, 30, 30);
-                }
+                size = 16;
+            }
+            else if (size > 64)
+            {
+                size = 64;
+            }
 
-                using (var white = new SolidBrush(Color.White))
-                {
-                    g.FillEllipse(white, 18, 9, 7, 7);
-                    var body = new Point[]
-                    {
-                        new Point(7, 16),
-                        new Point(16, 10),
-                        new Point(22, 16),
-                        new Point(16, 22)
-                    };
-                    g.FillPolygon(white, body);
-                }
+            return FromResource(size);
+        }
 
-                return Icon.FromHandle(bmp.GetHicon());
+        private static Icon FromResource(int size)
+        {
+            var stream = typeof(AppIconFactory).Assembly.GetManifestResourceStream("BreakFishApp.Assets.app.ico");
+            if (stream == null)
+            {
+                throw new InvalidOperationException("找不到应用图标资源 Assets/app.ico。");
+            }
+
+            using (stream)
+            {
+                return new Icon(stream, size, size);
             }
         }
     }

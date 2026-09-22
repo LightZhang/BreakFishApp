@@ -57,10 +57,9 @@ namespace BreakFishApp.Forms
             _timer.Tick += OnTick;
             _timer.Start();
 
-            var icon = AppIconFactory.Create();
-            Icon = icon;
+            Icon = AppIconFactory.Create();
             _tray = new TrayManager(
-                icon,
+                AppIconFactory.CreateTray(),
                 () => _scheduler.GetCurrentState(),
                 ShowMain,
                 ShowSettings,
