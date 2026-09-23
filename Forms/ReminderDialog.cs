@@ -39,7 +39,8 @@ namespace BreakFishApp.Forms
             MinimizeBox = false;
             ShowInTaskbar = false;
             TopMost = true;
-            ClientSize = new Size(380, 340);
+            ClientSize = new Size(400, 360);
+            Padding = new Padding(28, 24, 28, 20);
             BackColor = UiTheme.Paper;
             Font = UiTheme.UiFont;
             Icon = AppIconFactory.Create();
@@ -47,10 +48,13 @@ namespace BreakFishApp.Forms
             _emoji = new Label
             {
                 Text = item != null ? (item.Emoji ?? "🐟") : "🐟",
-                Font = new Font("Microsoft YaHei UI", 28F),
+                Font = new Font("Segoe UI Emoji", 26F),
                 ForeColor = UiTheme.Ink,
-                Location = new Point(24, 22),
-                AutoSize = true
+                Location = new Point(28, 24),
+                Size = new Size(48, 48),
+                TextAlign = ContentAlignment.MiddleCenter,
+                AutoSize = false,
+                UseCompatibleTextRendering = true
             };
 
             _title = new Label
@@ -58,8 +62,12 @@ namespace BreakFishApp.Forms
                 Text = item != null ? (item.Title ?? "该休息一下了") : "该休息一下了",
                 Font = UiTheme.StatusFont,
                 ForeColor = UiTheme.Ink,
-                Location = new Point(76, 30),
-                AutoSize = true
+                Location = new Point(84, 32),
+                Size = new Size(288, 32),
+                TextAlign = ContentAlignment.MiddleLeft,
+                AutoSize = false,
+                UseCompatibleTextRendering = true,
+                Padding = new Padding(2, 0, 0, 0)
             };
 
             _message = new Label
@@ -69,16 +77,19 @@ namespace BreakFishApp.Forms
                     : "站起来活动几分钟，再回来继续工作。",
                 Font = UiTheme.UiFont,
                 ForeColor = UiTheme.Mute,
-                Location = new Point(24, 84),
-                Size = new Size(332, 60)
+                Location = new Point(28, 88),
+                Size = new Size(344, 64),
+                AutoSize = false,
+                UseCompatibleTextRendering = true,
+                Padding = new Padding(2, 0, 0, 0)
             };
 
             var change = UiTheme.GhostButton("🔄  换一个");
-            change.SetBounds(24, 150, 110, 30);
+            change.SetBounds(28, 164, 110, 30);
             change.Click += OnChange;
 
             var start = UiTheme.PrimaryButton("好，起来活动一下");
-            start.SetBounds(24, 192, 332, 44);
+            start.SetBounds(28, 208, 344, 44);
             start.Click += delegate
             {
                 ResultAction = ReminderAction.StartBreak;
@@ -87,7 +98,7 @@ namespace BreakFishApp.Forms
             };
 
             var snooze = UiTheme.GhostButton("5 分钟后再说");
-            snooze.SetBounds(24, 246, 162, 36);
+            snooze.SetBounds(28, 262, 168, 36);
             snooze.Click += delegate
             {
                 ResultAction = ReminderAction.Snooze;
@@ -96,7 +107,7 @@ namespace BreakFishApp.Forms
             };
 
             var skip = UiTheme.GhostButton("这次先跳过");
-            skip.SetBounds(194, 246, 162, 36);
+            skip.SetBounds(204, 262, 168, 36);
             skip.Click += delegate
             {
                 ResultAction = ReminderAction.Skip;
@@ -109,8 +120,11 @@ namespace BreakFishApp.Forms
                 Text = "身体是自己的，歇一下不耽误事",
                 Font = UiTheme.SmallFont,
                 ForeColor = UiTheme.Hint,
-                Location = new Point(24, 294),
-                AutoSize = true
+                Location = new Point(28, 314),
+                Size = new Size(344, 22),
+                AutoSize = false,
+                UseCompatibleTextRendering = true,
+                Padding = new Padding(2, 0, 0, 0)
             };
 
             Controls.Add(_emoji);

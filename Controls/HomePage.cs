@@ -178,7 +178,9 @@ namespace BreakFishApp.Controls
                 ForeColor = UiTheme.Ink,
                 Dock = DockStyle.Top,
                 Height = 30,
-                Margin = new Padding(0, 4, 0, 0)
+                Margin = new Padding(0, 4, 0, 0),
+                UseCompatibleTextRendering = true,
+                Padding = new Padding(2, 0, 0, 0)
             };
             _nextMessage = new Label
             {
@@ -187,7 +189,9 @@ namespace BreakFishApp.Controls
                 ForeColor = UiTheme.Mute,
                 Dock = DockStyle.Top,
                 Height = 48,
-                Margin = new Padding(0, 2, 0, 0)
+                Margin = new Padding(0, 2, 0, 0),
+                UseCompatibleTextRendering = true,
+                Padding = new Padding(2, 0, 0, 0)
             };
             _card.Controls.Add(_nextMessage);
             _card.Controls.Add(_nextTitle);
